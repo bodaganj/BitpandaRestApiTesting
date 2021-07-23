@@ -8,7 +8,7 @@
 .idea/
 
 #allure reports
-.allure-results/
+allure-results/
 
 # BlueJ files
 *.ctxt

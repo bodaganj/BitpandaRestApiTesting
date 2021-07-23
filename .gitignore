@@ -5,7 +5,8 @@
 *.log
 
 #idea
-.idea/*
+.idea
+target
 
 #allure reports
 allure-results/

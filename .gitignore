@@ -4,6 +4,12 @@
 # Log file
 *.log
 
+#idea
+.idea/
+
+#allure reports
+.allure-results/
+
 # BlueJ files
 *.ctxt
 

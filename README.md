@@ -1,0 +1,2 @@
+# BitpandaRestApiTesting
+REST API tests

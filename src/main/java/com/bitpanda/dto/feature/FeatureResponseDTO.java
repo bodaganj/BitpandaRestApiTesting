@@ -1,4 +1,4 @@
-package com.bitpanda.dto;
+package com.bitpanda.dto.feature;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SpaceDTO {
+public class FeatureResponseDTO {
 
    private String id;
-   private String title;
-   private String description;
-   private String owner;
-   private String[] rights;
+   private PropertiesDTO properties;
 }

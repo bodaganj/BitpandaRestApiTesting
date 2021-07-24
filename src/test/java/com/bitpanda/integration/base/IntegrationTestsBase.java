@@ -1,5 +1,6 @@
 package com.bitpanda.integration.base;
 
+import com.bitpanda.setup.EnvProperties;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.config.HttpClientConfig;
@@ -16,17 +17,16 @@ public abstract class IntegrationTestsBase {
 
    private static final Integer TIMEOUT = 20000;
 
-   @AfterEach
-   public void afterEachTest() {
-      RestAssured.reset();
-   }
-
-   protected RequestSpecification given() {
+   protected static RequestSpecification given() {
       RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
       return getRequestSpecification().baseUri(UriProperties.HERE_GATEWAY);
    }
 
-   private RequestSpecification getRequestSpecification() {
+   protected static String getPermanentAccessToken() {
+      return EnvProperties.getProperty("permanent.access.token");
+   }
+
+   private static RequestSpecification getRequestSpecification() {
       SSLConfig sslConfig = RestAssured.config().getSSLConfig().relaxedHTTPSValidation();
       HttpClientConfig httpClientConfig = HttpClientConfig.httpClientConfig()
                                                           .setParam("http.connection.stalecheck", true)
@@ -42,5 +42,10 @@ public abstract class IntegrationTestsBase {
                         .filter(new ApiRequestLoggingFilter(LogDetail.ALL))
                         .contentType(ContentType.JSON)
                         .log().ifValidationFails();
+   }
+
+   @AfterEach
+   public void afterEachTest() {
+      RestAssured.reset();
    }
 }

@@ -1,6 +1,6 @@
 package com.bitpanda.integration.tests.space;
 
-import com.bitpanda.dto.SpaceDTO;
+import com.bitpanda.dto.space.SpaceDTO;
 import com.bitpanda.integration.base.HereHubEndpoint;
 import com.bitpanda.integration.base.IntegrationTestsBase;
 import io.qameta.allure.Description;
@@ -11,13 +11,13 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 @Feature(HereHubEndpoint.SPACE_ENDPOINT)
-public class GetSpaceIntegrationTest extends IntegrationTestsBase {
+public class GetSpacesIntegrationTest extends IntegrationTestsBase {
 
    @Description("Positive case: default 'owner' and 'includeRights' parameter's values")
    @Test
    public void getSpaceWithDefaultParams() {
       SpaceDTO[] spaceResponse = given()
-         .queryParam("access_token", "AGHgflBFSwirWU6swBQ_XQA")
+         .queryParam("access_token", getPermanentAccessToken())
          .when()
          .get(HereHubEndpoint.SPACE_ENDPOINT)
          .then()
@@ -34,7 +34,7 @@ public class GetSpaceIntegrationTest extends IntegrationTestsBase {
    public void getSpaceWithIncludeRights() {
       SpaceDTO[] spaceResponse = given()
          .queryParam("includeRights", true)
-         .queryParam("access_token", "AGHgflBFSwirWU6swBQ_XQA")
+         .queryParam("access_token", getPermanentAccessToken())
          .when()
          .get(HereHubEndpoint.SPACE_ENDPOINT)
          .then()
@@ -58,7 +58,7 @@ public class GetSpaceIntegrationTest extends IntegrationTestsBase {
    public void getSpaceWithOwner() {
       SpaceDTO[] spaceResponse = given()
          .queryParam("owner", "others")
-         .queryParam("access_token", "AGHgflBFSwirWU6swBQ_XQA")
+         .queryParam("access_token", getPermanentAccessToken())
          .when()
          .get(HereHubEndpoint.SPACE_ENDPOINT)
          .then()
@@ -75,7 +75,7 @@ public class GetSpaceIntegrationTest extends IntegrationTestsBase {
    public void getSpaceWithNotRealOwner() {
       SpaceDTO[] spaceResponse = given()
          .queryParam("owner", "not real owner")
-         .queryParam("access_token", "AGHgflBFSwirWU6swBQ_XQA")
+         .queryParam("access_token", getPermanentAccessToken())
          .when()
          .get(HereHubEndpoint.SPACE_ENDPOINT)
          .then()

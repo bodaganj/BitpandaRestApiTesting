@@ -1,8 +1,9 @@
 package com.bitpanda.integration.tests.space;
 
 import com.bitpanda.dto.space.SpaceDTO;
-import com.bitpanda.integration.base.HereHubEndpoint;
+import com.bitpanda.integration.base.HereHubEndpoints;
 import com.bitpanda.integration.base.IntegrationTestsBase;
+import com.bitpanda.setup.Constants;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import org.assertj.core.api.Assertions;
@@ -10,16 +11,16 @@ import org.assertj.core.api.SoftAssertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-@Feature(HereHubEndpoint.SPACE_ENDPOINT)
+@Feature(HereHubEndpoints.SPACE_ENDPOINT)
 public class GetSpacesIntegrationTest extends IntegrationTestsBase {
 
    @Description("Positive case: default 'owner' and 'includeRights' parameter's values")
    @Test
    public void getSpaceWithDefaultParams() {
       SpaceDTO[] spaceResponse = given()
-         .queryParam("access_token", getPermanentAccessToken())
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
          .when()
-         .get(HereHubEndpoint.SPACE_ENDPOINT)
+         .get(HereHubEndpoints.SPACE_ENDPOINT)
          .then()
          .statusCode(200)
          .extract().body().as(SpaceDTO[].class);
@@ -33,10 +34,10 @@ public class GetSpacesIntegrationTest extends IntegrationTestsBase {
    @Test
    public void getSpaceWithIncludeRights() {
       SpaceDTO[] spaceResponse = given()
-         .queryParam("includeRights", true)
-         .queryParam("access_token", getPermanentAccessToken())
+         .queryParam(Constants.INCLUDE_RIGHTS, true)
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
          .when()
-         .get(HereHubEndpoint.SPACE_ENDPOINT)
+         .get(HereHubEndpoints.SPACE_ENDPOINT)
          .then()
          .statusCode(200)
          .extract().body().as(SpaceDTO[].class);
@@ -57,10 +58,10 @@ public class GetSpacesIntegrationTest extends IntegrationTestsBase {
    @Test
    public void getSpaceWithOwner() {
       SpaceDTO[] spaceResponse = given()
-         .queryParam("owner", "others")
-         .queryParam("access_token", getPermanentAccessToken())
+         .queryParam(Constants.OWNER, "others")
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
          .when()
-         .get(HereHubEndpoint.SPACE_ENDPOINT)
+         .get(HereHubEndpoints.SPACE_ENDPOINT)
          .then()
          .statusCode(200)
          .extract().body().as(SpaceDTO[].class);
@@ -74,10 +75,10 @@ public class GetSpacesIntegrationTest extends IntegrationTestsBase {
    @Test
    public void getSpaceWithNotRealOwner() {
       SpaceDTO[] spaceResponse = given()
-         .queryParam("owner", "not real owner")
-         .queryParam("access_token", getPermanentAccessToken())
+         .queryParam(Constants.OWNER, wrongTestData)
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
          .when()
-         .get(HereHubEndpoint.SPACE_ENDPOINT)
+         .get(HereHubEndpoints.SPACE_ENDPOINT)
          .then()
          .statusCode(200)
          .extract().body().as(SpaceDTO[].class);
@@ -92,21 +93,21 @@ public class GetSpacesIntegrationTest extends IntegrationTestsBase {
    public void getSpaceMissingAccessToken() {
       given()
          .when()
-         .get(HereHubEndpoint.SPACE_ENDPOINT)
+         .get(HereHubEndpoints.SPACE_ENDPOINT)
          .then()
          .statusCode(403)
-         .body("errorMessage", Matchers.is("Accessing this resource with an anonymous token is not possible."));
+         .body(Constants.ERROR_MESSAGE, Matchers.is("Accessing this resource with an anonymous token is not possible."));
    }
 
    @Description("Negative case: authorization token ('access_token') is not correct.")
    @Test
    public void getSpaceWrongAccessToken() {
       given()
-         .queryParam("access_token", "wrong access token")
+         .queryParam(Constants.ACCESS_TOKEN, wrongTestData)
          .when()
-         .get(HereHubEndpoint.SPACE_ENDPOINT)
+         .get(HereHubEndpoints.SPACE_ENDPOINT)
          .then()
          .statusCode(401)
-         .body("errorMessage", Matchers.is("Unauthorized"));
+         .body(Constants.ERROR_MESSAGE, Matchers.is(Constants.UNAUTHORIZED));
    }
 }

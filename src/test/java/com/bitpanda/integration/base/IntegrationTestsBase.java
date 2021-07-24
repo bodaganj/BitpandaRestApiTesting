@@ -9,21 +9,24 @@ import io.restassured.config.SSLConfig;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import lombok.Getter;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 
-import java.util.Collections;
+import java.util.UUID;
 
 public abstract class IntegrationTestsBase {
 
+   @Getter
+   private static final String permanentAccessToken = EnvProperties.getProperty("permanent.access.token");
    private static final Integer TIMEOUT = 20000;
+   private static final String HERE_GATEWAY = EnvProperties.getProperty("url.here.gateway");
+
+   protected String wrongTestData = "wrong test data";
 
    protected static RequestSpecification given() {
       RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-      return getRequestSpecification().baseUri(UriProperties.HERE_GATEWAY);
-   }
-
-   protected static String getPermanentAccessToken() {
-      return EnvProperties.getProperty("permanent.access.token");
+      return getRequestSpecification().baseUri(HERE_GATEWAY);
    }
 
    private static RequestSpecification getRequestSpecification() {
@@ -38,8 +41,8 @@ public abstract class IntegrationTestsBase {
       return RestAssured.given()
                         .config(config)
                         .filter(new AllureRestAssured())
-                        .filter(new ApiResponseLoggingFilter(Collections.singletonList(LogDetail.ALL)))
-                        .filter(new ApiRequestLoggingFilter(LogDetail.ALL))
+                        .filter(new ApiResponseLoggingFilter(LogDetail.ALL, System.out, Matchers.any(Integer.class)))
+                        .filter(new ApiRequestLoggingFilter(LogDetail.ALL, System.out, true))
                         .contentType(ContentType.JSON)
                         .log().ifValidationFails();
    }
@@ -47,5 +50,9 @@ public abstract class IntegrationTestsBase {
    @AfterEach
    public void afterEachTest() {
       RestAssured.reset();
+   }
+
+   protected String getTestFeatureId() {
+      return UUID.randomUUID().toString() + "_test_feature_id";
    }
 }

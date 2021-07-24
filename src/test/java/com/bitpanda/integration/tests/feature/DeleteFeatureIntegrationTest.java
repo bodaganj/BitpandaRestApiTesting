@@ -1,21 +1,17 @@
 package com.bitpanda.integration.tests.feature;
 
-import com.bitpanda.dto.feature.FeatureRequestDTO;
-import com.bitpanda.dto.feature.GeometryDTO;
-import com.bitpanda.dto.feature.PropertiesDTO;
-import com.bitpanda.dto.feature.XyzDTO;
 import com.bitpanda.dto.space.SpaceDTO;
-import com.bitpanda.integration.base.HereHubEndpoint;
+import com.bitpanda.integration.base.HereHubEndpoints;
 import com.bitpanda.integration.base.IntegrationTestsBase;
+import com.bitpanda.integration.base.helper.FeatureBodyProvider;
+import com.bitpanda.setup.Constants;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
-@Feature(HereHubEndpoint.FEATURE_ENDPOINT)
+@Feature(HereHubEndpoints.FEATURE_ENDPOINT)
 public class DeleteFeatureIntegrationTest extends IntegrationTestsBase {
 
    private static String spaceId;
@@ -23,9 +19,9 @@ public class DeleteFeatureIntegrationTest extends IntegrationTestsBase {
    @BeforeAll
    public static void beforeAllTests() {
       SpaceDTO[] spaceResponse = given()
-         .queryParam("access_token", getPermanentAccessToken())
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
          .when()
-         .get(HereHubEndpoint.SPACE_ENDPOINT)
+         .get(HereHubEndpoints.SPACE_ENDPOINT)
          .then()
          .statusCode(200)
          .extract().body().as(SpaceDTO[].class);
@@ -36,15 +32,15 @@ public class DeleteFeatureIntegrationTest extends IntegrationTestsBase {
    @Description("Positive case: delete existed feature")
    @Test
    public void deleteFeature() {
-      String featureId = UUID.randomUUID().toString() + "_test_feature_id";
+      String featureId = getTestFeatureId();
       createFeatureToBeDeleted(featureId);
 
       given()
-         .pathParam("spaceId", spaceId)
-         .pathParam("featureId", featureId)
-         .queryParam("access_token", getPermanentAccessToken())
+         .pathParam(Constants.SPACE_ID, spaceId)
+         .pathParam(Constants.FEATURE_ID, featureId)
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
          .when()
-         .delete(HereHubEndpoint.FEATURE_ENDPOINT)
+         .delete(HereHubEndpoints.FEATURE_ENDPOINT)
          .then()
          .statusCode(204);
    }
@@ -52,99 +48,74 @@ public class DeleteFeatureIntegrationTest extends IntegrationTestsBase {
    @Description("Negative case: not existed spaceId")
    @Test
    public void deleteFeatureWrongSpaceId() {
-      String featureId = UUID.randomUUID().toString() + "_test_feature_id";
-      createFeatureToBeDeleted(featureId);
+      String featureId = getTestFeatureId();
 
       given()
-         .pathParam("spaceId", "wrong space id")
-         .pathParam("featureId", featureId)
-         .queryParam("access_token", getPermanentAccessToken())
+         .pathParam(Constants.SPACE_ID, wrongTestData)
+         .pathParam(Constants.FEATURE_ID, featureId)
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
          .when()
-         .delete(HereHubEndpoint.FEATURE_ENDPOINT)
+         .delete(HereHubEndpoints.FEATURE_ENDPOINT)
          .then()
          .statusCode(404)
-         .body("errorMessage", Matchers.is("The resource with this ID does not exist."));
+         .body(Constants.ERROR_MESSAGE, Matchers.is(Constants.RESOURCE_DOES_NOT_EXIST));
    }
 
    @Description("Negative case: not existed featureId")
    @Test
    public void deleteFeatureWrongFeatureId() {
-      String featureId = UUID.randomUUID().toString() + "_test_feature_id";
-      createFeatureToBeDeleted(featureId);
-
       given()
-         .pathParam("spaceId", spaceId)
-         .pathParam("featureId", "wrong feature id")
-         .queryParam("access_token", getPermanentAccessToken())
+         .pathParam(Constants.SPACE_ID, spaceId)
+         .pathParam(Constants.FEATURE_ID, wrongTestData)
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
          .when()
-         .delete(HereHubEndpoint.FEATURE_ENDPOINT)
+         .delete(HereHubEndpoints.FEATURE_ENDPOINT)
          .then()
          .statusCode(404)
-         .body("errorMessage", Matchers.is("The requested resource does not exist."));
+         .body(Constants.ERROR_MESSAGE, Matchers.is("The requested resource does not exist."));
    }
 
    @Description("Negative case: missing access token")
    @Test
    public void deleteFeatureMissingAccessToken() {
-      String featureId = UUID.randomUUID().toString() + "_test_feature_id";
+      String featureId = getTestFeatureId();
       createFeatureToBeDeleted(featureId);
 
       given()
-         .pathParam("spaceId", spaceId)
-         .pathParam("featureId", featureId)
+         .pathParam(Constants.SPACE_ID, spaceId)
+         .pathParam(Constants.FEATURE_ID, featureId)
          .when()
-         .delete(HereHubEndpoint.FEATURE_ENDPOINT)
+         .delete(HereHubEndpoints.FEATURE_ENDPOINT)
          .then()
          .statusCode(403)
-         .body("errorMessage", Matchers.startsWith("Insufficient rights. Token access"));
+         .body(Constants.ERROR_MESSAGE, Matchers.startsWith(Constants.INSUFFICIENT_RIGHTS));
    }
 
    @Description("Negative case: wrong access token")
    @Test
    public void deleteFeatureWrongAccessToken() {
-      String featureId = UUID.randomUUID().toString() + "_test_feature_id";
-      createFeatureToBeDeleted(featureId);
+      String featureId = getTestFeatureId();
 
       given()
-         .pathParam("spaceId", spaceId)
-         .pathParam("featureId", featureId)
-         .queryParam("access_token", "wrong access token")
+         .pathParam(Constants.SPACE_ID, spaceId)
+         .pathParam(Constants.FEATURE_ID, featureId)
+         .queryParam(Constants.ACCESS_TOKEN, wrongTestData)
          .when()
-         .delete(HereHubEndpoint.FEATURE_ENDPOINT)
+         .delete(HereHubEndpoints.FEATURE_ENDPOINT)
          .then()
          .statusCode(401)
-         .body("errorMessage", Matchers.is("Unauthorized"));
+         .body(Constants.ERROR_MESSAGE, Matchers.is(Constants.UNAUTHORIZED));
    }
 
    private void createFeatureToBeDeleted(String featureId) {
       given()
-         .pathParam("spaceId", spaceId)
-         .pathParam("featureId", featureId)
-         .queryParam("access_token", getPermanentAccessToken())
-         .body(getFeatureBody(featureId))
+         .pathParam(Constants.SPACE_ID, spaceId)
+         .pathParam(Constants.FEATURE_ID, featureId)
+         .queryParam(Constants.ACCESS_TOKEN, getPermanentAccessToken())
+         .body(FeatureBodyProvider.getFeatureBody(featureId))
          .when()
-         .put(HereHubEndpoint.FEATURE_ENDPOINT)
+         .put(HereHubEndpoints.FEATURE_ENDPOINT)
          .then()
          .statusCode(200);
-   }
-
-   private FeatureRequestDTO getFeatureBody(String featureId) {
-      return FeatureRequestDTO.builder()
-                              .type("Feature")
-                              .id(featureId)
-                              .geometry(GeometryDTO.builder()
-                                                   .type("Point")
-                                                   .coordinates(new Double[]{-2.960847, 53.430828})
-                                                   .build())
-                              .properties(PropertiesDTO.builder()
-                                                       .name("Anfield")
-                                                       .xyz(XyzDTO.builder()
-                                                                  .tags(new String[]{"football", "stadium"})
-                                                                  .build())
-                                                       .amenity("Football Stadium")
-                                                       .capacity(55000)
-                                                       .description("Home of Liverpool Football Club")
-                                                       .build())
-                              .build();
    }
 }

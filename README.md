@@ -23,7 +23,7 @@ under ```${project.basedir}/target/site/allure-maven-plugin/index.html```
 
 ## Link to CI on GitHub
 
-https://github.com/bodaganj/BitpandaRestApiTesting/actions/workflows/maven.yml
+https://github.com/bodaganj/BitpandaRestApiTesting/actions/workflows/mavenFinal.yml
 
 ## Tech stack
 
